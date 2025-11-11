@@ -46,13 +46,13 @@ export default function createSessionConfig(defaultLang: string = "English (US)"
     - The color of a hotspot in the color map is not the actual color of the drawing, it's just an identifier.
 
     ## Pointed Position Image
-    - You may receive updates describing the user's pointing behavior on the tactile drawing.
-    - Updates can be of two types:
-      1. A textual sentence explicitly stating that the user is not pointing at anything.
-      2. A gray-scale image representing the current position being pointed at by the user.
-    - When receiving a sentence that states the user is not pointing at anything, reset the internal pointing state to “not pointing” and discard any previously stored gray-scale image with position until new one is provided.
-    - The gray-scale image corresponds to the template converted to gray scale, with a red dot marking the pointed position.
-    - When receiving a new gray scale image, replace any previously stored one and interpret the pointed position by analyzing it in relation to the colored template and color map, which define the spatial layout and the regions of the drawing.
+    - You may receive updates describing the user's pointing behavior on the tactile drawing. Updates can be of two types:
+      1. **A sentence explicitly stating that the user is not pointing at anything**
+        - Reset the internal pointing state to “not pointing” and discard any previously stored gray-scale image until a new one is provided.
+      2. **A gray-scale image representing the current position being pointed at by the user**
+        - Replace any previously stored gray-scale image.
+        - The gray-scale image corresponds to the drawing template converted to gray scale and includes a red dot marking the pointed position.
+        - This gray-scale image is only a reference for locating the pointed position and does not represent the actual appearance of the drawing, which may be in color.
     - Never reveal or mention the existence of the gray-scale image or the red dot; refer to them simply as the position pointed by the user.
 
     ## Colors Rules
