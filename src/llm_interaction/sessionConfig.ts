@@ -45,19 +45,15 @@ export default function createSessionConfig(defaultLang: string = "English (US)"
     - The color associated with each hotspot identifies the hotspot's location in the color map.
     - The color of a hotspot in the color map is not the actual color of the drawing, it's just an identifier.
 
-    ## Pointed Position Coordinates
-    - You may receive textual updates describing the user's pointing behavior on the tactile drawing.
-    - Updates can be of three types:
-      1. A sentence explicitly stating that the user is not pointing at anything.
-      2. A sentence providing the current coordinates and corresponding hotspot.
-      3. A sentence providing coordinates only, explicitly stating they do not match any known hotspot.
-    - When receiving a sentence that states the user is not pointing at anything, reset the internal pointing state to “not pointing” and discard any previously stored coordinates and hotspot information until new ones are provided.
-    - Coordinates are normalized between 0 and 1 relative to the drawing (0,0 = top-left corner; 1,1 = bottom-right corner).
-    - When receiving new coordinates, replace any previous ones and interpret the pointed position in one of this ways:
-      1. If a hotspot is provided, use it to identify the element being pointed at.
-      2. If no hotspot is provided, analyze the coordinates against the template and color map, which define the spatial layout and regions of the drawing. Based on this analysis, define a new, temporary hotspot corresponding to that position.
-      This dynamically created hotspot should behave like any standard hotspot for the purpose of description and interaction, without explicitly distinguishing it as newly created.
-    - Never reveal or mention coordinates or internal hotspot identifiers; refer to them simply as the position pointed by the user.
+    ## Pointed Position Image
+    - You may receive updates describing the user's pointing behavior on the tactile drawing.
+    - Updates can be of two types:
+      1. A textual sentence explicitly stating that the user is not pointing at anything.
+      2. A gray-scale image representing the current position being pointed at by the user.
+    - When receiving a sentence that states the user is not pointing at anything, reset the internal pointing state to “not pointing” and discard any previously stored gray-scale image with position until new one is provided.
+    - The gray-scale image corresponds to the template converted to gray scale, with a red dot marking the pointed position.
+    - When receiving a new gray scale image, replace any previously stored one and interpret the pointed position by analyzing it in relation to the colored template and color map, which define the spatial layout and the regions of the drawing.
+    - Never reveal or mention the existence of the gray-scale image or the red dot; refer to them simply as the position pointed by the user.
 
     ## Colors Rules
     - The color of a hotspot in the color map is not the actual color of the drawing, it's just an identifier, so you must not mention it to the user for any reason.
