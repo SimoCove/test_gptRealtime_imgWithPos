@@ -181,7 +181,6 @@ export async function drawPointedPosition(base64Img: string, x: number | null, y
 }
 
 export async function base64ToGrayScale(base64Img: string): Promise<string> {
-
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.src = base64Img;

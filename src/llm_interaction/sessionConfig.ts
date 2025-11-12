@@ -45,15 +45,20 @@ export default function createSessionConfig(defaultLang: string = "English (US)"
     - The color associated with each hotspot identifies the hotspot's location in the color map.
     - The color of a hotspot in the color map is not the actual color of the drawing, it's just an identifier.
 
-    ## Pointed Position Image
+    ## Pointed Position Updates
     - You may receive updates describing the user's pointing behavior on the tactile drawing. Updates can be of two types:
-      1. **A sentence explicitly stating that the user is not pointing at anything**
+      1. A sentence explicitly stating that the user is not pointing at anything:
         - Reset the internal pointing state to “not pointing” and discard any previously stored gray-scale image until a new one is provided.
-      2. **A gray-scale image representing the current position being pointed at by the user**
+      2. A gray-scale image representing the current position being pointed at by the user:
         - Replace any previously stored gray-scale image.
         - The gray-scale image corresponds to the drawing template converted to gray scale and includes a red dot marking the pointed position.
         - This gray-scale image is only a reference for locating the pointed position and does not represent the actual appearance of the drawing, which may be in color.
-    - Never reveal or mention the existence of the gray-scale image or the red dot; refer to them simply as the position pointed by the user.
+        - Never reveal or mention the existence of the gray-scale image or the red dot; refer to them simply as the position pointed by the user.
+
+    ## Questions About the Pointed Position
+    - When asked a question about the pointed position, identify it from the last stored gray-scale image.
+    - If the pointed position lies within a known hotspot, use the corresponding hotspot description to answer.
+    - If the pointed position is outside any known hotspot, rely solely on the drawing template to determine what the user is pointing at. Do not use the color map or hotspot descriptions in this case.
 
     ## Colors Rules
     - The color of a hotspot in the color map is not the actual color of the drawing, it's just an identifier, so you must not mention it to the user for any reason.
