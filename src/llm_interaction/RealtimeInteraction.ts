@@ -733,7 +733,8 @@ export class RealtimeInteraction {
             const currentHotspot = this.getCurrentHotspot();
             const { x: lastX, y: lastY } = this.getLastCoords();
 
-            const positionChanged = this.checkPointedPositionVariation(currentX, currentY, lastX, lastY);
+            //const positionChanged = this.checkPointedPositionVariation(currentX, currentY, lastX, lastY);
+            const positionChanged = true;
 
             if (positionChanged) {
                 this.lastCoords = { lastX: currentX, lastY: currentY };
