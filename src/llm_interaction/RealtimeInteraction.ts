@@ -52,6 +52,8 @@ export class RealtimeInteraction {
     private lastCoords: { lastX: number | null, lastY: number | null } = { lastX: 100000, lastY: 100000 }; // 100000 are only placeholders
     private imgDimensions: { x: number; y: number } = { x: -1, y: -1 }; // -1 are only placeholders
 
+    private lastImgWithPositionItemId: string | null = null;
+
     // ---------------
     // INITIALIZATION
     // ---------------
@@ -107,6 +109,7 @@ export class RealtimeInteraction {
         await this.connectToModel();
 
         this.resetLastCoords();
+        this.resetLastImgWithPositionItemId();
     }
 
     private stopSession(): void {
@@ -140,12 +143,16 @@ export class RealtimeInteraction {
         this.handleAudioState(false);
     }
 
-    // ------------------
-    // RESET COORDINATES
-    // ------------------
+    // -------
+    // RESETS
+    // -------
 
     private resetLastCoords(): void {
         this.lastCoords = { lastX: 100000, lastY: 100000 }; // 100000 are only placeholders
+    }
+
+    private resetLastImgWithPositionItemId(): void {
+        this.lastImgWithPositionItemId = null;
     }
 
     // ------------
@@ -345,6 +352,18 @@ export class RealtimeInteraction {
                     this.startResponseTimer();
                     break;
 
+                // handle conversation items
+                case "conversation.item.done":
+                    const item = msg.item;
+                    // get item_id of image with position message
+                    // note: this is not a robust method to extract pointed position image messages, but it is the simplest one
+                    if (item.content[0].type === "input_text" &&
+                        item.content[0].text === "The user is pointing at the position represented in this image:" &&
+                        item.content[1].type === "input_image") {
+                        this.setLastImgWithPositionItemID(item.id);
+                    }
+                    break;
+
                 // transcription of the text response in the UI
                 case "response.content_part.added":
                     if (this.elements) this.elements.modelResponse.textContent = "";
@@ -530,9 +549,7 @@ export class RealtimeInteraction {
                 content: [
                     {
                         type: "input_text",
-                        text: `
-                            Tactile drawing data:
-                            `
+                        text: "Tactile drawing data:"
                     },
                     {
                         type: "input_text",
@@ -577,13 +594,9 @@ export class RealtimeInteraction {
 
         let textMsg: string = "";
         if (type === "template") {
-            textMsg = `
-                    Tactile drawing template image:
-                    `;
+            textMsg = "Tactile drawing template image:";
         } else if (type === "colorMap") {
-            textMsg = `
-                    Tactile drawing color map image:
-                    `;
+            textMsg = "Tactile drawing color map image:";
         }
 
         const res = {
@@ -811,7 +824,7 @@ export class RealtimeInteraction {
             resContent = [
                 {
                     type: "input_text",
-                    text: `The user is not pointing any position.`
+                    text: "The user is not pointing any position."
                 }
             ];
 
@@ -821,9 +834,7 @@ export class RealtimeInteraction {
             resContent = [
                 {
                     type: "input_text",
-                    text: `
-                        The user is pointing at the position represented in this image:
-                        `
+                    text: "The user is pointing at the position represented in this image:"
                 },
                 {
                     type: "input_image",
@@ -841,7 +852,28 @@ export class RealtimeInteraction {
             }
         };
 
+        this.deleteLastImgWithPosition();
         this.dataChannel.send(JSON.stringify(res));
         console.log("User pointed position sent to the model");
+    }
+
+    // --------------------------------
+    // PREVIOUS POINTED POSITION IMAGE
+    // --------------------------------
+
+    private setLastImgWithPositionItemID(itemId: string): void {
+        this.lastImgWithPositionItemId = itemId;
+    }
+
+    private deleteLastImgWithPosition(): void {
+        const itemId = this.lastImgWithPositionItemId;
+        if (!itemId) return;
+
+        const deleteItem = {
+            type: "conversation.item.delete",
+            item_id: itemId
+        };
+
+        this.dataChannel!.send(JSON.stringify(deleteItem));
     }
 }
